@@ -3,16 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 import Weather from "./Components/Wether"
+import store from "./store";
+import { Provider } from "react-redux";
 
-class App extends React.Component{
-
-  render(){
+const App = () =>{
     return(
-      <Fragment>
+      <Provider store={store}>
         <Weather />
-      </Fragment>
+      </Provider>
     )
-  }
 }
 
 ReactDOM.render(<App/>, document.getElementById("root"));

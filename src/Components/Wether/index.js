@@ -1,61 +1,46 @@
 import React from "react";
-import axios from "axios";
 import "./index.css";
+import { connect } from "react-redux";
+import { updateWeather } from "../../Services/api-service";
+import { getWeather } from "../../Actions/WeatherActions";
 
 import Clock from "../Clock";
 
 class Weather extends React.Component{
 
-    // API_URL = `https://api.openweathermap.org/data/2.5/weather?q=Rivne&appid=d663677633bd6cb690bbdea66fe5a981&units=metric`;
-
-    state = {
-        weather: "",
-        location: "Рівне",
-        coord: "",
-        temp: "",
-        time: "",
-        date: "",
-    }
-
     componentDidMount(){
-        this.updateWeather(this.state.location);
-    }
-
-    async updateWeather(location){
-        const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=c1fb2275690ca17e568dd7636b4f9511&lang=ua&units=metric`
-        await axios.get(API_URL)
-      .then((res) => {
-        console.log(res.data.name)
-        this.setState({
-          items: res.data,
-          weather: res.data.weather[0].description,
-          temp: res.data.main.temp,
-          coord: res.data.coord
-        });
+      console.log("componentDidMount PROPS ", this.props);
+      const { getWeather } = this.props;
+      updateWeather("Рівне").then(weather => {
+        console.log("weather ",weather)
+        const newWeather = {
+          weather: "",
+          location: weather.name,
+          coord: "",
+          temp: "",
+          time: "",
+          date: "",
+        }
+        getWeather(newWeather);
       })
-      .catch((err) => console.log(err.responceText));
     }
-    getCity = (event) => {
-        console.log(event.target.value)
-        this.setState({
-        location: event.target.value,
-        });
-  }
 
     handleSubmit = (event)  =>{
-    event.preventDefault();
-    this.updateWeather(this.state.location);
-  }
+        event.preventDefault();
+    }
 
-    render(){
-        const { location, weather, temp } = this.state;
-        return(
+    render (){
+    const { location, weather, temp } = this.props.Weather;
+
+    console.log("PROPS================>>>", this.props);
+    return(
+     
              <div className="container-fluid px-1 px-md-4 py-5 mx-auto">
         <div className="row d-flex justify-content-center px-3">
           <div className="card">
             <form onSubmit={this.handleSubmit}>
               <div className="group ml-auto mr-4 mt-3 mb-0">
-                <input type="text" onChange={this.getCity} required />
+                <input type="text"  required />
                 <span className="bar" />
                 <label>Введіть місто</label>
               </div>
@@ -71,4 +56,14 @@ class Weather extends React.Component{
     }
 }
 
-export default Weather;
+const mapStateToProps = ({ WeatherReducer }) => {
+ console.log("mapStateToProps ",WeatherReducer)
+ const { Weather, loading } = WeatherReducer;
+  return { Weather, loading };
+};
+const mapDispatchToProps = {
+  getWeather
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Weather);
