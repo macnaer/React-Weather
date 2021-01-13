@@ -42,13 +42,12 @@ class Weather extends React.Component{
         });
   }
 
-    handleSubmit(event) {
+    handleSubmit = (event)  =>{
     event.preventDefault();
     this.updateWeather(this.state.location);
   }
 
     render(){
-    console.log("STATE" , this.state);
         const { location, weather, temp } = this.state;
         return(
              <div className="container-fluid px-1 px-md-4 py-5 mx-auto">
