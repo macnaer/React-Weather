@@ -2,43 +2,72 @@ import React from "react";
 import axios from "axios";
 import "./index.css";
 
+import Clock from "../Clock";
+
 class Weather extends React.Component{
 
-    API_URL = `https://api.openweathermap.org/data/2.5/weather?q=Rivne&appid=d663677633bd6cb690bbdea66fe5a981`;
+    // API_URL = `https://api.openweathermap.org/data/2.5/weather?q=Rivne&appid=d663677633bd6cb690bbdea66fe5a981&units=metric`;
 
     state = {
-        coord: {lon: 26.2274, lat: 50.6231},
-        dt: 1610388203,
-        id: 695594,
-        main: {temp: 270.7, feels_like: 266.88, temp_min: 270.7, temp_max: 270.7, pressure: 1022},
-        name: "Rivne",
-        sys: {country: "UA", sunrise: 1610345577, sunset: 1610375560},
-        date: new Date()
+        weather: "",
+        location: "Рівне",
+        coord: "",
+        temp: "",
+        time: "",
+        date: "",
     }
 
     componentDidMount(){
-        axios.get(this.API_URL).then(res => {
-        console.log(res.data)
-        }).catch(err => console.log(err))
+        this.updateWeather(this.state.location);
     }
 
+    async updateWeather(location){
+        const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=c1fb2275690ca17e568dd7636b4f9511&lang=ua&units=metric`
+        await axios.get(API_URL)
+      .then((res) => {
+        console.log(res.data.name)
+        this.setState({
+          items: res.data,
+          weather: res.data.weather[0].description,
+          temp: res.data.main.temp,
+          coord: res.data.coord
+        });
+      })
+      .catch((err) => console.log(err.responceText));
+    }
+    getCity = (event) => {
+        console.log(event.target.value)
+        this.setState({
+        location: event.target.value,
+        });
+  }
+
+    handleSubmit(event) {
+    event.preventDefault();
+    this.updateWeather(this.state.location);
+  }
 
     render(){
     console.log("STATE" , this.state);
-    const { name, main, date } = this.state;
+        const { location, weather, temp } = this.state;
         return(
-            <div className="container-fluid px-1 px-md-4 py-5 mx-auto">
-            <div className="row d-flex justify-content-center px-3">
-                <div className="card">
-                    <h2 className="ml-auto mr-4 mt-3 mb-0">{name}</h2>
-                    <p className="ml-auto mr-4 mb-0 med-font">Snow</p>
-                    <h1 className="ml-auto mr-4 large-font">{main.temp}&#176;</h1>
-                    <h1 className="ml-auto mr-4 large-font">{main.feels_like}&#176;</h1>
-                    <p className="time-font mb-0 ml-4 mt-auto">{date.toLocaleTimeString()}<span className="sm-font"></span></p>
-                    <p className="ml-4 mb-4">{date.getFullYear()}</p>
-                </div>
-            </div>
+             <div className="container-fluid px-1 px-md-4 py-5 mx-auto">
+        <div className="row d-flex justify-content-center px-3">
+          <div className="card">
+            <form onSubmit={this.handleSubmit}>
+              <div className="group ml-auto mr-4 mt-3 mb-0">
+                <input type="text" onChange={this.getCity} required />
+                <span className="bar" />
+                <label>Введіть місто</label>
+              </div>
+            </form>
+            <h2 className="ml-auto mr-4 mt-3 mb-0">{location}</h2>
+            <p className="ml-auto mr-4 mb-0 med-font">{weather}</p>
+            <h1 className="ml-auto mr-4 large-font">{temp}&#176;</h1>
+            <Clock />
+          </div>
         </div>
+      </div>
         )
     }
 }
